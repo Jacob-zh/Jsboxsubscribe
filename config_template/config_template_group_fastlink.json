@@ -1,0 +1,544 @@
+{
+  "log":
+  {
+    "level": "info",
+    "timestamp": false
+  },
+  "dns":
+  {
+    "independent_cache": true,
+    "servers": [
+      {
+        "tag": "dns_remote",
+        "address": "https://1.0.0.1/dns-query",
+        "address_resolver": "dns_local",
+        "address_strategy": "ipv4_only",
+        "strategy": "ipv4_only",
+        "detour": "默认选择"
+      },
+      {
+        "tag": "dns_local",
+        "address": "223.5.5.5",
+        "strategy": "ipv4_only",
+        "detour": "DIRECT"
+      },
+      {
+        "tag": "dns-block",
+        "address": "rcode://success"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "dns_local",
+        "disable_cache": true
+      },
+      {
+        "domain_suffix": ["appcenter.ms", "firebase.io", "crashlytics.com"],
+        "server": "dns-block"
+      },
+      {
+        "clash_mode": "direct",
+        "server": "dns_local"
+      },
+      {
+        "clash_mode": "global",
+        "server": "dns_remote"
+      },
+      {
+        "rule_set": ["ads"],
+        "server": "dns-block"
+      },
+      {
+        "domain_suffix": ["googleapis.cn"],
+        "server": "dns_remote"
+      },
+      {
+        "rule_set": ["jproxy", "binance", "instagram", "facebook", "telegram", "twitter", "youtube", "google", "uncn"],
+        "server": "dns_remote"
+      },
+      {
+        "rule_set": ["jdirect", "applications", "private", "cn"],
+        "server": "dns_local"
+      }
+    ],
+    "final": "dns_local",
+    "strategy": "ipv4_only"
+  },
+  "inbounds": [
+    {
+      "tag": "tun-in",
+      "type": "tun",
+      "inet4_address": ["172.19.0.1/30"],
+      "mtu": 9000,
+      "auto_route": true,
+      "strict_route": false,
+      "endpoint_independent_nat": false,
+      "stack": "mixed",
+      "include_package": [],
+      "exclude_package": [],
+      "platform":
+      {
+        "http_proxy":
+        {
+          "enabled": false,
+          "server": "127.0.0.1",
+          "server_port": 2080
+        }
+      },
+      "sniff": true,
+      "sniff_override_destination": false,
+      "sniff_timeout": "300ms"
+    },
+    {
+      "tag": "mixed-in",
+      "type": "mixed",
+      "listen": "127.0.0.1",
+      "listen_port": 2080,
+      "sniff": true,
+      "sniff_override_destination": false,
+      "sniff_timeout": "300ms"
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "默认选择",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "DIRECT",
+        "REJECT"
+      ]
+    },
+    {
+      "tag": "自建节点",
+      "type": "selector",
+      "outbounds": [
+        "{self_node}"
+      ]
+    },
+    {
+      "tag": "IPLC节点",
+      "type": "selector",
+      "outbounds": [
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["IPLC|iplc"]}
+      ]
+    },
+    {
+      "tag": "普通节点",
+      "type": "selector",
+      "outbounds": [
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["中转|Anycast"]}
+      ]
+    },
+    {
+      "tag": "高速下载",
+      "type": "selector",
+      "outbounds": [
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["高速|下载|福利"]}
+      ]
+    },
+    {
+      "tag": "电报",
+      "type": "selector",
+      "default": "普通节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|高速|福利"]}
+      ]
+    },
+    {
+      "tag": "油管",
+      "type": "selector",
+      "default": "普通节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|Anycast|福利"]}
+      ]
+    },
+    {
+      "tag": "推特",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|福利"]}
+      ]
+    },
+    {
+      "tag": "脸书",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|福利"]}
+      ]
+    },
+    {
+      "tag": "币安",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|Anycast|高速"]}
+      ]
+    },
+    {
+      "tag": "谷歌服务",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|福利|高速"]}
+      ]
+    },
+    {
+      "tag": "微软服务",
+      "type": "selector",
+      "default": "DIRECT",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点","DIRECT",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|福利|高速"]}
+      ]
+    },
+    {
+      "tag": "代理域名",
+      "type": "selector",
+      "default": "IPLC节点",
+      "outbounds": [
+        "IPLC节点","普通节点","高速下载","自建节点",
+        "{tag_1}"
+      ],
+      "filter": [
+        {"action":"include","keywords":["01|福利|高速"]}
+      ]
+    },
+    {
+      "tag": "广告拦截",
+      "type": "selector",
+      "outbounds": ["REJECT", "DIRECT", "默认选择"]
+    },
+    {
+      "tag": "漏网之鱼",
+      "type": "selector",
+      "outbounds": ["默认选择", "DIRECT"]
+    },
+    {
+      "tag": "DIRECT",
+      "type": "direct"
+    },
+    {
+      "tag": "REJECT",
+      "type": "block"
+    },
+    {
+      "tag": "dns-out",
+      "type": "dns"
+    }
+  ],
+  "route":
+  {
+    "auto_detect_interface": true,
+    "rule_set": [
+      {
+        "tag": "ads",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/ads.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "applications",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/applications.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/cn.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "cnip",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/cnip.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "private",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/private.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "privateip",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/privateip.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "telegramip",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/telegramip.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "uncn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/proxy.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "youtube",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/sing-box-ruleset/youtube.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "binance",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-binance.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "instagram",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-instagram.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "facebook",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-facebook.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "github",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-github.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "google",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "microsoft",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-microsoft.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "twitter",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-twitter.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "telegram",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-telegram.srs",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "jproxy",
+        "type": "remote",
+        "format": "source",
+        "url": "https://wdav.606909.xyz/share/sibox/jbox_proxy_rule.json",
+        "download_detour": "默认选择"
+      },
+      {
+        "tag": "jdirect",
+        "type": "remote",
+        "format": "source",
+        "url": "https://wdav.606909.xyz/share/sibox/jbox_direct_rule.json",
+        "download_detour": "默认选择"
+      }
+    ],
+    "rules": [
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "outbound": "dns-out"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 853
+          },
+          {
+            "network": "udp",
+            "port": 443
+          },
+          {
+            "protocol": "stun"
+          },
+          {
+            "domain_suffix": ["appcenter.ms", "firebase.io", "crashlytics.com"]
+          }
+        ],
+        "outbound": "REJECT"
+      },
+      {
+        "rule_set": "ads",
+        "outbound": "广告拦截"
+      },
+      {
+        "clash_mode": "direct",
+        "outbound": "DIRECT"
+      },
+      {
+        "clash_mode": "global",
+        "outbound": "默认选择"
+      },
+      {
+        "rule_set": ["private"],
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": ["applications"],
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": ["jproxy"],
+        "outbound": "代理域名"
+      },
+      {
+        "rule_set": ["youtube"],
+        "outbound": "油管"
+      },
+      {
+        "rule_set": ["twitter"],
+        "outbound": "推特"
+      },
+      {
+        "rule_set": ["instagram","facebook"],
+        "outbound": "脸书"
+      },
+      {
+        "rule_set": ["binance"],
+        "outbound": "币安"
+      },
+      {
+        "rule_set": ["telegram"],
+        "outbound": "电报"
+      },
+      {
+        "rule_set": ["github"],
+        "outbound": "代理域名"
+      },
+      {
+        "rule_set": ["google"],
+        "outbound": "谷歌服务"
+      },
+      {
+        "rule_set": ["microsoft"],
+        "outbound": "微软服务"
+      },
+      {
+        "rule_set": ["uncn"],
+        "outbound": "代理域名"
+      },
+      {
+        "rule_set": ["jdirect"],
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": ["cn"],
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": ["telegramip"],
+        "outbound": "电报"
+      },
+      {
+        "rule_set": ["privateip"],
+        "outbound": "DIRECT"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "DIRECT"
+      },
+      {
+        "rule_set": ["cnip"],
+        "outbound": "DIRECT"
+      }
+    ],
+    "final": "漏网之鱼"
+  },
+  "experimental":
+  {
+    "cache_file":
+    {
+      "enabled": true
+    },
+    "clash_api":
+    {
+      "external_controller": "",
+      "external_ui": "metacubexd",
+      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "默认选择",
+      "default_mode": "Rule"
+    }
+  }
+}
